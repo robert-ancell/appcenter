@@ -53,7 +53,7 @@ namespace AppCenter {
             recent_label.margin_left = 12;
 
             var recent_scrolled = new Gtk.ScrolledWindow (null, null);
-            recent_scrolled.hscrollbar_policy = Gtk.PolicyType.NEVER;
+            recent_scrolled.vscrollbar_policy = Gtk.PolicyType.NEVER;
             var recent_carousel = new Widgets.AppCarousel ();
             recent_scrolled.add (recent_carousel);
 
