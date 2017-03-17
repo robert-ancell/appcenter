@@ -6,6 +6,7 @@ vala_precompile(VALA_C ${EXEC_NAME}
 
     Application.vala
     MainWindow.vala
+    Homepage.vala
     Settings.vala
     SuspendControl.vala
     AbstractAppContainer.vala
@@ -17,6 +18,7 @@ vala_precompile(VALA_C ${EXEC_NAME}
     Views/SearchView.vala
     Views/InstalledView.vala
     Views/View.vala
+    Widgets/Banner.vala
     Widgets/CategoryItem.vala
     Widgets/FeaturedButton.vala
     Widgets/PackageRow.vala
