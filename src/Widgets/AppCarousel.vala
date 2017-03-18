@@ -24,9 +24,11 @@
 
  		public AppCarousel () {
 
- 			this.homogeneous = true;
+ 			var main_content = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+ 			main_content.homogeneous = true;
+ 			main_content.expand = true;
 
- 			for (int i = 0; i < 30; i++) {
+ 			for (int i = 0; i < 5; i++) {
  				var carousel_item_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
 
  				Gtk.Image app_image = new Gtk.Image.from_icon_name ("application-default-icon", Gtk.IconSize.DIALOG);
@@ -50,8 +52,15 @@
  				carousel_item_button.margin_right = 12;
  				carousel_item_button.margin_left = 12;
  				carousel_item_button. add (carousel_item_box);
- 				add(carousel_item_button);
+ 				main_content.add (carousel_item_button);
  			}
+
+ 			add (main_content);
+
+ 			var more_button = new Gtk.Button.with_label (_("More"));
+ 			more_button.get_style_context ().add_class ("flat");
+ 			more_button.margin_right = 12;
+ 			add (more_button);
  			
  		}
 
