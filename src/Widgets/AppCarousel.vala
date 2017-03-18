@@ -22,11 +22,44 @@
 
  	public class AppCarousel : Gtk.Box {
 
+ 		// public  AppCarousel (Gee.Collection<AppCenterCore.Package> packages)
  		public AppCarousel () {
 
  			var main_content = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
  			main_content.homogeneous = true;
  			main_content.expand = true;
+
+ 			/*
+ 			foreach (AppCenterCore.Package in packages) {
+
+				var carousel_item_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+
+ 				Gtk.Image app_image = new Gtk.Image.from_gicon (package.get_icon (), Gtk.IconSize.DIALOG);
+ 				app_image.margin_right = 12;
+ 				
+ 				var package_information_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+ 				var package_name_label = new Gtk.Label (package.get_name ());
+ 				package_name_label.xalign = 0;
+
+ 				// TODO: get the category from the package
+ 				var category_label = new Gtk.Label ("Category");
+ 				category_label.sensitive = false;
+ 				category_label.xalign = 0;
+ 				package_information_box.valign = Gtk.Align.CENTER;
+ 				package_information_box.pack_start (package_name_label, false, false, 0);
+ 				package_information_box.pack_start (category_label, false, false, 0);
+
+ 				carousel_item_box.pack_start (app_image, false, false, 0);
+ 				carousel_item_box.pack_start (package_information_box, false, false, 0);
+ 				
+ 				var carousel_item_button = new Gtk.Button ();
+ 				carousel_item_button.get_style_context ().remove_class ("button");
+ 				carousel_item_button.margin_right = 12;
+ 				carousel_item_button.margin_left = 12;
+ 				carousel_item_button. add (carousel_item_box);
+ 				main_content.add (carousel_item_button);
+ 			}
+ 			*/
 
  			for (int i = 0; i < 5; i++) {
  				var carousel_item_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
