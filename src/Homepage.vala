@@ -62,6 +62,7 @@ namespace AppCenter {
             var trending_more_button = new Gtk.Button ();
             trending_more_button.add (trending_more_button_label);
             trending_more_button.halign = Gtk.Align.END;
+            trending_more_button.valign = Gtk.Align.CENTER;
             trending_box.add (trending_label);
             trending_box.add (trending_more_button);
             trending_box.homogeneous = true;
@@ -81,6 +82,7 @@ namespace AppCenter {
             var recent_more_button = new Gtk.Button ();
             recent_more_button.add (recent_more_button_label);
             recent_more_button.halign = Gtk.Align.END;
+            recent_more_button.valign = Gtk.Align.CENTER;
             recent_box.add (recent_label);
             recent_box.add (recent_more_button);
             recent_box.homogeneous = true;
