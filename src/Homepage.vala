@@ -34,17 +34,16 @@ namespace AppCenter {
             var banner = new Widgets.Banner ();
             banner_box.add (banner);
 
-            var trending_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
-            var categories_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
-
     		var trending_label = new Gtk.Label ("Trending");
             trending_label.get_style_context ().add_class ("h4");
             trending_label.xalign = 0;
             trending_label.margin_left = 12;
 
             var trending_scrolled = new Gtk.ScrolledWindow (null, null);
-            trending_scrolled.hscrollbar_policy = Gtk.PolicyType.NEVER;
+            trending_scrolled.height_request = 100;
             var trending_carousel = new Widgets.AppCarousel ();
+            var trending_sizegroup = new Gtk.SizeGroup (Gtk.SizeGroupMode.HORIZONTAL);
+            trending_sizegroup.add_widget (trending_carousel);
             trending_scrolled.add (trending_carousel);
 
     		var recent_label = new Gtk.Label ("Recent");
@@ -53,7 +52,7 @@ namespace AppCenter {
             recent_label.margin_left = 12;
 
             var recent_scrolled = new Gtk.ScrolledWindow (null, null);
-            recent_scrolled.vscrollbar_policy = Gtk.PolicyType.NEVER;
+            recent_scrolled.height_request = 100;
             var recent_carousel = new Widgets.AppCarousel ();
             recent_scrolled.add (recent_carousel);
 
