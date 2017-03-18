@@ -56,11 +56,6 @@
  			}
 
  			add (main_content);
-
- 			var more_button = new Gtk.Button.with_label (_("More"));
- 			more_button.get_style_context ().add_class ("flat");
- 			more_button.margin_right = 12;
- 			add (more_button);
  			
  		}
 

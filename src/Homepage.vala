@@ -52,17 +52,40 @@ namespace AppCenter {
             banner = new Widgets.Banner ();
             banner_box.add (banner);
 
+            var trending_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
     		var trending_label = new Gtk.Label ("Trending");
             trending_label.get_style_context ().add_class ("h4");
             trending_label.xalign = 0;
-            trending_label.margin_left = 12;
+
+            var trending_more_button_label = new Gtk.Label (_("<small>More</small>"));
+            trending_more_button_label.use_markup = true;
+            var trending_more_button = new Gtk.Button ();
+            trending_more_button.add (trending_more_button_label);
+            trending_more_button.halign = Gtk.Align.END;
+            trending_box.add (trending_label);
+            trending_box.add (trending_more_button);
+            trending_box.homogeneous = true;
+            trending_box.margin_left = 12;
+            trending_box.margin_right = 12;
+
 
             var trending_carousel = new Widgets.AppCarousel ();
 
+            var recent_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
     		var recent_label = new Gtk.Label ("Recent");
             recent_label.get_style_context ().add_class ("h4");
             recent_label.xalign = 0;
-            recent_label.margin_left = 12;
+
+            var recent_more_button_label = new Gtk.Label (_("<small>More</small>"));
+            recent_more_button_label.use_markup = true;
+            var recent_more_button = new Gtk.Button ();
+            recent_more_button.add (recent_more_button_label);
+            recent_more_button.halign = Gtk.Align.END;
+            recent_box.add (recent_label);
+            recent_box.add (recent_more_button);
+            recent_box.homogeneous = true;
+            recent_box.margin_left = 12;
+            recent_box.margin_right = 12;
 
             var recent_carousel = new Widgets.AppCarousel ();
 
@@ -74,9 +97,9 @@ namespace AppCenter {
     		category_view = new Views.CategoryView ();
 
             scrolled_box.add (banner_box);
-    		scrolled_box.add (trending_label);
+    		scrolled_box.add (trending_box);
             scrolled_box.add (trending_carousel);
-    		scrolled_box.add (recent_label);
+    		scrolled_box.add (recent_box);
             scrolled_box.add (recent_carousel);
     		scrolled_box.add (categories_label);
     		scrolled_box.add (category_view.category_flow);
