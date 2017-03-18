@@ -27,11 +27,29 @@ namespace AppCenter {
 
     	public Homepage () {
 
+            var client = AppCenterCore.Client.get_default ();
+            var all_packages = 
+
     	    scrolled_window = new Gtk.ScrolledWindow (null, null);
             var scrolled_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
 
             var banner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
-            var banner = new Widgets.Banner ();
+            Widgets.Banner banner;
+
+            /*
+                string featured_app = HoustonClient.get_default ().get_featured_app ();
+                AppCenterCore.Package featured_package  = AppCenterCore.Client.get_default ().get_app_package (featured_app);
+                string last_known_featured = AppCenter.Settings.get_default ().featured_app;
+                AppCenterCore.Package last_featured_package = AppCenterCore.Client.get_default ().get_app_package (last_known_featured);
+                banner = new Widgets.Banner ();
+                if (featured_package != null) {
+                    banner.set_package (featured_package);
+                } else if (last_featured_package != null)
+                    banner.set_package (last_featured_package);
+                }
+            */
+
+            banner = new Widgets.Banner ();
             banner_box.add (banner);
 
     		var trending_label = new Gtk.Label ("Trending");

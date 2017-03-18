@@ -46,42 +46,77 @@ namespace AppCenter.Widgets {
     		}
     	}
 
+    	private Gtk.Label app_name_label;
+    	private Gtk.Label summary_label;
+    	private Gtk.Label description_label;
+    	private Gtk.Box app_content_box;
+    	private Gtk.Box spinner_box;
+    	private Gtk.Image icon;
+
 		public Banner () {
 			foreground_color = "white";
-			background_color = "rgba(66,83,129,255)";
+			background_color = "rgba(104,117,142,255)";
 			reload_css ();
 			this.height_request = 300;
 
-			var app_name_label = new Gtk.Label ("App Name");
+			app_name_label = new Gtk.Label ("App Name");
 			app_name_label.get_style_context ().add_class ("h1");
-			var generic_description_label = new Gtk.Label ("Generic Name");
-			generic_description_label.get_style_context ().add_class ("h2");
+			summary_label = new Gtk.Label ("Summary");
+			summary_label.get_style_context ().add_class ("h2");
 			var description_label = new Gtk.Label ("Full Description");
 			description_label.get_style_context ().add_class ("h3");
 			app_name_label.xalign = 0;
-			generic_description_label.xalign = 0;
+			summary_label.xalign = 0;
 			description_label.xalign = 0;
 			description_label.margin_top = 25;
 
-			Gtk.Image icon = new Gtk.Image.from_icon_name ("application-default-icon", Gtk.IconSize.DIALOG);
+			icon = new Gtk.Image.from_icon_name ("application-default-icon", Gtk.IconSize.DIALOG);
 			icon.xalign = 1;
 			icon.margin = 25;
-			var horizontal_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
+			app_content_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
 			var vertical_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 
 			vertical_box.pack_start (app_name_label, false, false, 0);
-			vertical_box.pack_start (generic_description_label, false, false, 0);
+			vertical_box.pack_start (summary_label, false, false, 0);
 			vertical_box.pack_start (description_label, false, false, 0);
 			vertical_box.valign = Gtk.Align.CENTER;
 
-			horizontal_box.pack_start (icon, true, true, 0);
-			horizontal_box.pack_start (vertical_box, true, true, 0);
+			app_content_box.pack_start (icon, true, true, 0);
+			app_content_box.pack_start (vertical_box, true, true, 0);
 
-			this.add (horizontal_box);
+			spinner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+			var spinner = new Gtk.Spinner ();
+			spinner.height_request = 48;
+			spinner.active = true;
+			var apps_updating_label = new Gtk.Label (_("Getting the newest apps"));
+			apps_updating_label.get_style_context ().add_class ("h2");
+			spinner_box.expand = true;
+			spinner_box.valign = Gtk.Align.CENTER;
+			spinner_box.add (spinner);
+			spinner_box.add (apps_updating_label);
+
+
+			var main_container = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
+			main_container.add (app_content_box);
+			main_container.add (spinner_box);
+
+			this.add (main_container);
+
+			app_content_box.no_show_all = true;
+			app_content_box.hide ();
 		}
 
-		public Banner.with_package () {
+		public void set_package (AppCenterCore.Package package) {
+			app_name_label.label = package.get_name ();
+			summary_label.label = package.get_summary ();
+			description_label.label = package.component.get_description ();
+			icon = new Gtk.Image.from_gicon (package.get_icon (), Gtk.IconSize.DIALOG);
 
+			app_content_box.no_show_all = false;
+			app_content_box.show ();
+
+			spinner_box.no_show_all = true;
+			spinner_box.hide ();
 		}
 
 		private void on_any_color_change () {
