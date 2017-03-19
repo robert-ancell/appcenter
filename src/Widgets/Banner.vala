@@ -35,14 +35,14 @@
 namespace AppCenter.Widgets {
     public class Banner : Gtk.Button {
 
-
     	private string _background_color;
     	public string background_color {
     		get {
     			return _background_color;
-			} set {
-				_background_color = value;
-			}
+  			} set {
+  				_background_color = value;
+          on_any_color_change ();
+  			}
     	}
     	private string _foreground_color;
     	public string foreground_color {
@@ -50,6 +50,7 @@ namespace AppCenter.Widgets {
     			return _foreground_color;
     		} set {
     			_foreground_color = value;
+          on_any_color_change ();
     		}
     	}
 
@@ -70,7 +71,7 @@ namespace AppCenter.Widgets {
 			app_name_label.get_style_context ().add_class ("h1");
 			summary_label = new Gtk.Label ("Summary");
 			summary_label.get_style_context ().add_class ("h2");
-			var description_label = new Gtk.Label ("Full Description");
+			var description_label = new Gtk.Label ("Description");
 			description_label.get_style_context ().add_class ("h3");
 			app_name_label.xalign = 0;
 			summary_label.xalign = 0;
@@ -90,6 +91,8 @@ namespace AppCenter.Widgets {
 
 			app_content_box.pack_start (icon, true, true, 0);
 			app_content_box.pack_start (vertical_box, true, true, 0);
+      app_content_box.expand = true;
+      app_content_box.valign = Gtk.Align.CENTER;
 
 			spinner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
 			var spinner = new Gtk.Spinner ();
@@ -116,8 +119,18 @@ namespace AppCenter.Widgets {
 		public void set_package (AppCenterCore.Package package) {
 			app_name_label.label = package.get_name ();
 			summary_label.label = package.get_summary ();
-			description_label.label = package.component.get_description ();
-			icon = new Gtk.Image.from_gicon (package.get_icon (), Gtk.IconSize.DIALOG);
+      description_label.label = package.get_description ();
+      icon.gicon = package.get_icon ();
+
+      var color_primary = package.get_color_primary ();
+      if (color_primary != null) {
+        background_color = color_primary;
+      }
+
+      var color_primary_text = package.get_color_primary_text ();
+      if (color_primary_text != null) {
+        foreground_color = color_primary_text;
+      }
 
 			app_content_box.no_show_all = false;
 			app_content_box.show ();
@@ -131,19 +144,17 @@ namespace AppCenter.Widgets {
 		}
 
 		private void reload_css () {
-
-
-			var provider = new Gtk.CssProvider ();
-	        try {
-	            var colored_css = BANNER_STYLE_CSS.printf (background_color, foreground_color);
-	            provider.load_from_data (colored_css, colored_css.length);
-	            var context = get_style_context ();
-	            context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-	            context.add_class ("banner");
-				context.remove_class ("button");
-	        } catch (GLib.Error e) {
-	            critical (e.message);
-	        }
+		  var provider = new Gtk.CssProvider ();
+      try {
+        var colored_css = BANNER_STYLE_CSS.printf (background_color, foreground_color);
+        provider.load_from_data (colored_css, colored_css.length);
+        var context = get_style_context ();
+        context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        context.add_class ("banner");
+	      context.remove_class ("button");
+      } catch (GLib.Error e) {
+        critical (e.message);
+      }
 		}
 
 	}
