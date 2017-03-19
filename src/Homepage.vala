@@ -27,27 +27,12 @@ namespace AppCenter {
         private Gtk.ScrolledWindow scrolled_window;
 
         public Homepage () {
-
-            var houston = AppCenterCore.Houston.get_default ();
-
             scrolled_window = new Gtk.ScrolledWindow (null, null);
             var scrolled_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
             var banner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
 
             newest_banner = new Widgets.Banner ();
-            var newest_ids = houston.get_newest ();
-            if (newest_ids.length > 0) {
-                // TODO: iterate over all newest packages to find the first one uninstalled
-                var newest_id = newest_ids[1] + ".desktop";
-                var newest_package = AppCenterCore.Client.get_default ().get_package_for_id (newest_id);
-                if (newest_package != null) {
-                    newest_banner.set_package (newest_package);
-
-                    newest_banner.clicked.connect (() => {
-                        // show_package (newest_package);
-                    });
-                }
-            }
+            AppCenterCore.Houston.get_default ().changing_newest.connect (update_newest_banner);
             banner_box.add (newest_banner);
 
             var trending_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -105,6 +90,20 @@ namespace AppCenter {
 
             scrolled_window.add (scrolled_box);
             this.add (scrolled_window);
+
+            AppCenterCore.Houston.get_default ().get_newest ();
+        }
+
+        public async void update_newest_banner () {
+            var houston = AppCenterCore.Houston.get_default ();
+            if (houston.newest.length > 0) {
+                // var newest_id = houston.newest[1] + ".desktop";
+                var newest_id = "com.github.btkostner.vocal.desktop";
+                var newest_package = AppCenterCore.Client.get_default ().get_package_for_id (newest_id);
+                if (newest_package != null) {
+                    newest_banner.set_package (newest_package);
+                }
+            }
         }
     }
 }

@@ -19,8 +19,13 @@ public class AppCenterCore.Houston : Object {
 
     private Soup.Session session;
 
+    public signal void changing_newest ();
+    public string[] newest;
+
     construct {
         session = new Soup.Session ();
+
+        newest = {};
     }
 
     private Json.Object process_response (string res) throws Error {
@@ -42,26 +47,27 @@ public class AppCenterCore.Houston : Object {
         return root;
     }
 
-    public string[] get_newest () {
+    public async void get_newest () {
         var uri = HOUSTON_API_URL + "/newest";
-
-        stdout.printf ("%s\n", uri);
-
         var message = new Soup.Message ("GET", uri);
-        session.send_message (message);
 
-        string[] app_ids = {};
-        try {
-            var data = process_response ((string) message.response_body.data).get_array_member ("data");
+        session.queue_message (message, (session, msg) => {
+            try {
+                var data = process_response ((string) msg.response_body.data).get_array_member ("data");
 
-            foreach (var id in data.get_elements ()) {
-                app_ids += ((string) id.get_value ());
+                stdout.printf ("testing");
+
+                string[] ids = {};
+                foreach (var id in data.get_elements ()) {
+                    ids += ((string) id.get_value ());
+                }
+                newest = ids;
+            } catch (Error e) {
+                stderr.printf ("Unable to fetch newest list from Houston: %s", e.message);
             }
-        } catch (Error e) {
-            stderr.printf ("Houston: %s\n", e.message);
-        }
 
-        return app_ids;
+            changing_newest ();
+        });
     }
 
     private static GLib.Once<Houston> instance;

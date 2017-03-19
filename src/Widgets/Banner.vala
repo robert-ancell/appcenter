@@ -40,10 +40,10 @@ namespace AppCenter.Widgets {
         public string background_color {
             get {
                 return _background_color;
-              } set {
+            } set {
                   _background_color = value;
                   on_any_color_change ();
-              }
+            }
         }
         private string _foreground_color;
         public string foreground_color {
@@ -120,7 +120,7 @@ namespace AppCenter.Widgets {
             app_name_label.label = package.get_name ();
             summary_label.label = package.get_summary ();
             description_label.label = package.get_description ();
-            icon.gicon = package.get_icon ();
+            icon.gicon = package.get_icon (128);
 
             var color_primary = package.get_color_primary ();
             if (color_primary != null) {
