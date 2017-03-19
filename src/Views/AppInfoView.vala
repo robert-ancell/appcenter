@@ -29,11 +29,15 @@ namespace AppCenter.Views {
         Gtk.ListBox extension_box;
         Gtk.Label extension_label;
         Gtk.Grid content_grid;
+        Widgets.AppRating app_rating;
 
         construct {
             image.margin_top = 12;
             image.margin_start = 6;
             image.pixel_size = 128;
+
+            app_rating = new Widgets.AppRating.with_ratings (0.8, 1.0, 0.95);
+            app_rating.hexpand = true;
 
             app_screenshot = new Gtk.Image ();
             app_screenshot.width_request = 800;
@@ -102,6 +106,7 @@ namespace AppCenter.Views {
             content_grid.margin_top = 48;
             content_grid.row_spacing = 24;
             content_grid.orientation = Gtk.Orientation.VERTICAL;
+            content_grid.add (app_rating);
             content_grid.add (screenshot_stack);
             content_grid.add (package_summary);
             content_grid.add (app_description);
