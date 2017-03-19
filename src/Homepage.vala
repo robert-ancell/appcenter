@@ -22,8 +22,9 @@
 namespace AppCenter {
     public class Homepage: Gtk.Box {
 
+      public Widgets.Banner newest_banner;
     	public AppCenter.Views.CategoryView category_view;
-        private Gtk.ScrolledWindow scrolled_window;
+      private Gtk.ScrolledWindow scrolled_window;
 
     	public Homepage () {
 
@@ -33,19 +34,24 @@ namespace AppCenter {
             var scrolled_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
             var banner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
 
-            // TODO: iterate over all newest packages to find the first one uninstalled
-            var banner = new Widgets.Banner ();
-            var newest = houston.get_newest ();
-            if (newest.length > 0) {
-                var newest_package = AppCenterCore.Client.get_default ().get_package_for_id (newest[1] + ".desktop");
+            newest_banner = new Widgets.Banner ();
+            var newest_ids = houston.get_newest ();
+            if (newest_ids.length > 0) {
+                // TODO: iterate over all newest packages to find the first one uninstalled
+                var newest_id = newest_ids[1] + ".desktop";
+                var newest_package = AppCenterCore.Client.get_default ().get_package_for_id (newest_id);
                 if (newest_package != null) {
-                    banner.set_package (newest_package);
+                    newest_banner.set_package (newest_package);
+
+                    newest_banner.clicked.connect (() => {
+                        // show_package (newest_package);
+                    });
                 }
             }
-            banner_box.add (banner);
+            banner_box.add (newest_banner);
 
             var trending_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
-    		var trending_label = new Gtk.Label ("Trending");
+    		    var trending_label = new Gtk.Label ("Trending");
             trending_label.get_style_context ().add_class ("h4");
             trending_label.xalign = 0;
 

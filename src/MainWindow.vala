@@ -29,7 +29,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
     private Gtk.Stack button_stack;
     private ulong task_finished_connection = 0U;
     private Gee.Deque<string> return_button_history;
-    
+
     public static Views.InstalledView installed_view { get; private set; }
 
     public MainWindow (Gtk.Application app) {
@@ -81,7 +81,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
                 search_entry.text = "";
                 return true;
             }
-            
+
             return false;
         });
 
@@ -97,7 +97,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
 
     construct {
         icon_name = "system-software-install";
-        set_size_request (910, 640);        
+        set_size_request (910, 640);
         title = _("AppCenter");
         window_position = Gtk.WindowPosition.CENTER;
 
@@ -105,11 +105,11 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
         return_button.no_show_all = true;
         return_button.get_style_context ().add_class ("back-button");
         return_button_history = new Gee.LinkedList<string> ();
-        
+
         search_all_button = new Gtk.Button.with_label (_("Search Apps"));
         search_all_button.no_show_all = true;
         search_all_button.get_style_context ().add_class ("back-button");
-        
+
         button_stack = new Gtk.Stack ();
         button_stack.add (return_button);
         button_stack.add (search_all_button);
@@ -201,7 +201,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
 
     public void show_package (AppCenterCore.Package package) {
         homepage.category_view.show_package (package);
-        view_opened (_("Categories"), false, null);    
+        view_opened (_("Categories"), false, null);
     }
 
     public void go_to_installed () {
@@ -258,7 +258,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
             search_all_button.no_show_all = true;
             search_all_button.hide ();
         }
-    
+
         if (return_button_history.is_empty || return_button_history.peek_head () != return_name) {
             return_button_history.offer_head (return_name);
         }
@@ -291,7 +291,7 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
                 search_all_button.show_all ();
             }
         }
-        
+
         if (stack.visible_child == homepage.category_view) {
             search_entry.placeholder_text = _("Search Apps");
         }
@@ -311,17 +311,17 @@ public class AppCenter.MainWindow : Gtk.ApplicationWindow {
         View view = (View) stack.visible_child;
         view.return_clicked ();
     }
-    
+
     private void search_all_apps () {
         homepage_header.label = "";
-        
+
         search_entry.placeholder_text = _("Search Apps");
         search_entry.grab_focus_without_selecting ();
-        
+
         return_button_history.poll_head ();
         return_button.no_show_all = true;
         return_button.hide ();
-    
+
         homepage.category_view.return_clicked ();
         trigger_search ();
     }
