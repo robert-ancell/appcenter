@@ -27,29 +27,21 @@ namespace AppCenter {
 
     	public Homepage () {
 
-            var client = AppCenterCore.Client.get_default ();
-            var all_packages = 
+            var houston = AppCenterCore.Houston.get_default ();
 
     	    scrolled_window = new Gtk.ScrolledWindow (null, null);
             var scrolled_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
-
             var banner_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 12);
-            Widgets.Banner banner;
 
-            /*
-                string featured_app = HoustonClient.get_default ().get_featured_app ();
-                AppCenterCore.Package featured_package  = AppCenterCore.Client.get_default ().get_app_package (featured_app);
-                string last_known_featured = AppCenter.Settings.get_default ().featured_app;
-                AppCenterCore.Package last_featured_package = AppCenterCore.Client.get_default ().get_app_package (last_known_featured);
-                banner = new Widgets.Banner ();
-                if (featured_package != null) {
-                    banner.set_package (featured_package);
-                } else if (last_featured_package != null)
-                    banner.set_package (last_featured_package);
+            // TODO: iterate over all newest packages to find the first one uninstalled
+            var banner = new Widgets.Banner ();
+            var newest = houston.get_newest ();
+            if (newest.length > 0) {
+                var newest_package = AppCenterCore.Client.get_default ().get_package_for_id (newest[1] + ".desktop");
+                if (newest_package != null) {
+                    banner.set_package (newest_package);
                 }
-            */
-
-            banner = new Widgets.Banner ();
+            }
             banner_box.add (banner);
 
             var trending_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
@@ -91,7 +83,7 @@ namespace AppCenter {
 
             var recent_carousel = new Widgets.AppCarousel ();
 
-    		var categories_label = new Gtk.Label ("Categories"); 
+    		var categories_label = new Gtk.Label ("Categories");
             categories_label.get_style_context ().add_class ("h4");
             categories_label.xalign = 0;
             categories_label.margin_left = 12;

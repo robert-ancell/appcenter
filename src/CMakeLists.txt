@@ -1,6 +1,7 @@
 vala_precompile(VALA_C ${EXEC_NAME}
     Core/ChangeInformation.vala
     Core/Client.vala
+    Core/Houston.vala
     Core/Package.vala
     Core/Task.vala
 
@@ -31,11 +32,13 @@ vala_precompile(VALA_C ${EXEC_NAME}
     ${CMAKE_CURRENT_BINARY_DIR}/config.vala
 PACKAGES
     appstream
-    gtk+-3.0>=3.12
     gee-0.8
     granite
-    packagekit-glib2
+    gtk+-3.0>=3.12
+    json-glib-1.0
+    libsoup-2.4
     libxml-2.0
+    packagekit-glib2
     ${UNITY_PACKAGES}
 OPTIONS
   --vapidir=${CMAKE_SOURCE_DIR}/vapi
@@ -51,4 +54,3 @@ add_executable (${EXEC_NAME} ${VALA_C} ${GLIB_RESOURCES_CATEGORIES})
 target_link_libraries (${EXEC_NAME} ${DEPS_LIBRARIES} ${UNITY_LIBRARIES})
 
 install (TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)
-
