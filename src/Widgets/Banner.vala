@@ -18,12 +18,19 @@
  * Authored by: Nathan Dyer <mail@nathandyer.me>
  */
 
+
  const string BANNER_STYLE_CSS = """
-    .banner {
-    	background-color: %s;
-        color: %s;
-    }
-    """;
+     .banner {
+         background-color: %s;
+         color: %s;
+     }
+     .banner .button {
+         background-color: @base_color;
+     }
+     """;
+
+ const string DEFAULT_BANNER_COLOR_PRIMARY = "#68758e";
+ const string DEFAULT_BANNER_COLOR_PRIMARY_TEXT = "white";
 
 namespace AppCenter.Widgets {
     public class Banner : Gtk.Button {
@@ -54,8 +61,8 @@ namespace AppCenter.Widgets {
     	private Gtk.Image icon;
 
 		public Banner () {
-			foreground_color = "white";
-			background_color = "rgba(104,117,142,255)";
+			foreground_color = DEFAULT_BANNER_COLOR_PRIMARY_TEXT;
+			background_color = DEFAULT_BANNER_COLOR_PRIMARY;
 			reload_css ();
 			this.height_request = 300;
 
@@ -124,7 +131,7 @@ namespace AppCenter.Widgets {
 		}
 
 		private void reload_css () {
-			
+
 
 			var provider = new Gtk.CssProvider ();
 	        try {
