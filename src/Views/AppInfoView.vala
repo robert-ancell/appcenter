@@ -18,8 +18,23 @@
  * Authored by: Corentin Noël <corentin@elementary.io>
  */
 
+const string BANNER_STYLE_CSS = """
+    .banner {
+        background-color: %s;
+        color: %s;
+    }
+    .banner .button {
+        background-color: @base_color;
+    }
+    """;
+
+const string DEFAULT_BANNER_COLOR_PRIMARY = "#68758e";
+const string DEFAULT_BANNER_COLOR_PRIMARY_TEXT = "white";
+
 namespace AppCenter.Views {
     public class AppInfoView : AppCenter.AbstractAppContainer {
+        Gtk.Grid links_grid;
+        Gtk.Box header_box;
         Gtk.Image app_screenshot;
         Gtk.Stack screenshot_stack;
         Gtk.Label app_screenshot_not_found;
@@ -71,10 +86,14 @@ namespace AppCenter.Views {
             app_version.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
             app_version.get_style_context ().add_class ("h3");
 
+            package_author = new Gtk.Label (null);
+            package_author.xalign = 0;
+            package_author.valign = Gtk.Align.START;
+            package_author.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
+            package_author.get_style_context ().add_class ("h2");
+
             package_summary = new Gtk.Label (null);
             package_summary.xalign = 0;
-            package_summary.valign = Gtk.Align.START;
-            package_summary.get_style_context ().add_class (Gtk.STYLE_CLASS_DIM_LABEL);
             package_summary.get_style_context ().add_class ("h2");
             package_summary.wrap = true;
             package_summary.set_lines (3);
@@ -89,30 +108,45 @@ namespace AppCenter.Views {
             app_description.pixels_inside_wrap = 3;
             app_description.wrap_mode = Gtk.WrapMode.WORD_CHAR;
 
+            links_grid = new Gtk.Grid ();
+            links_grid.column_spacing = 24;
+
             content_grid = new Gtk.Grid ();
             content_grid.width_request = 800;
             content_grid.halign = Gtk.Align.CENTER;
+            content_grid.margin_bottom = 48;
+            content_grid.margin_top = 48;
+            content_grid.row_spacing = 24;
             content_grid.orientation = Gtk.Orientation.VERTICAL;
             content_grid.add (screenshot_stack);
+            content_grid.add (package_summary);
             content_grid.add (app_description);
+            content_grid.add (links_grid);
 
             var scrolled = new Gtk.ScrolledWindow (null, null);
             scrolled.hscrollbar_policy = Gtk.PolicyType.NEVER;
             scrolled.expand = true;
             scrolled.add (content_grid);
 
+            header_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            header_box.get_style_context ().add_class ("banner");
+            header_box.hexpand = true;
+
             var header_grid = new Gtk.Grid ();
             header_grid.column_spacing = 12;
+            header_grid.halign = Gtk.Align.CENTER;
             header_grid.margin = 12;
+            header_grid.width_request = 800;
             header_grid.attach (image, 0, 0, 1, 2);
             header_grid.attach (package_name, 1, 0, 1, 1);
+            header_grid.attach (package_author, 1, 1, 3, 1);
             header_grid.attach (app_version, 2, 0, 1, 1);
             header_grid.attach (action_stack, 3, 0, 1, 1);
-            header_grid.attach (package_summary, 1, 1, 3, 1);
+            header_box.add (header_grid);
 
-            attach (header_grid, 0, 0, 1, 1);
-            attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, 1, 1, 1);
+            attach (header_box, 0, 0, 1, 1);
             attach (scrolled, 0, 2, 1, 1);
+            reload_css ();
         }
 
         public AppInfoView (AppCenterCore.Package package) {
@@ -136,9 +170,44 @@ namespace AppCenter.Views {
                 load_extensions.begin ();
             }
 
-            action_button.set_suggested_action_header ();
-            uninstall_button.set_destructive_action_header ();
+            var homepage_url = package.component.get_url (AppStream.UrlKind.HOMEPAGE);
+
+            if (homepage_url != null) {
+                var website_button = new UrlButton (_("Homepage"), homepage_url, "web-browser-symbolic");
+                links_grid.add (website_button);
+            }
+
+            var translate_url = package.component.get_url (AppStream.UrlKind.TRANSLATE);
+
+            if (translate_url != null) {
+                var translate_button = new UrlButton (_("Suggest Translations"), translate_url, "preferences-desktop-locale-symbolic");
+                links_grid.add (translate_button);
+            }
+
+            var bugtracker_url = package.component.get_url (AppStream.UrlKind.BUGTRACKER);
+
+            if (bugtracker_url != null) {
+                var bugtracker_button = new UrlButton (_("Report a Problem"), bugtracker_url, "bug-symbolic");
+                links_grid.add (bugtracker_button);
+            }
+
+            var help_url = package.component.get_url (AppStream.UrlKind.HELP);
+
+            if (help_url != null) {
+                var help_button = new UrlButton (_("Help"), help_url, "dialog-question-symbolic");
+                links_grid.add (help_button);
+            }
+
+            var action_button_context = action_button.get_style_context ();
+            action_button_context.add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+            action_button_context.add_class ("h3");
+
+            var uninstall_button_context = uninstall_button.get_style_context ();
+            uninstall_button_context.add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
+            uninstall_button_context.add_class ("h3");
+
             open_button.get_style_context ().add_class ("h3");
+            reload_css ();
         }
 
         protected override void set_up_package (uint icon_size = 48) {                
@@ -162,6 +231,34 @@ namespace AppCenter.Views {
                     extension_box.add (row);
                 }
             });
+        }
+
+        private void reload_css () {
+            var provider = new Gtk.CssProvider ();
+            try {
+                string color_primary;
+                string color_primary_text;
+                if (package != null) {
+                    color_primary = package.get_color_primary ();
+                    color_primary_text = DEFAULT_BANNER_COLOR_PRIMARY_TEXT;
+                } else {
+                    color_primary = null;
+                    color_primary_text = null;
+                }
+
+                if (color_primary == null) {
+                    color_primary = DEFAULT_BANNER_COLOR_PRIMARY;
+                }
+
+                if (color_primary_text == null) {
+                    color_primary_text = DEFAULT_BANNER_COLOR_PRIMARY_TEXT;
+                }
+                var colored_css = BANNER_STYLE_CSS.printf (color_primary, color_primary_text);
+                provider.load_from_data (colored_css, colored_css.length);
+                Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+            } catch (GLib.Error e) {
+                critical (e.message);
+            }
         }
 
         public void load_more_content () {
@@ -244,6 +341,27 @@ namespace AppCenter.Views {
                 } catch (Error e) {
                     critical (e.message);
                 }
+            }
+        }
+
+        class UrlButton : Gtk.LinkButton {
+            public UrlButton (string label, string uri, string icon_name) {
+                Object (uri: uri);
+                get_style_context ().add_class ("dim-label");
+                tooltip_text = uri;
+                
+                var icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.LARGE_TOOLBAR);
+
+                var title = new Gtk.Label (label);
+
+                var grid = new Gtk.Grid ();
+                grid.row_spacing = 6;
+                grid.margin = 3;
+                grid.orientation = Gtk.Orientation.VERTICAL;
+                grid.add (icon);
+                grid.add (title);
+
+                add (grid);
             }
         }
     }

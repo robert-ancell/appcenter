@@ -14,7 +14,6 @@ vala_precompile(VALA_C ${EXEC_NAME}
     AbstractAppList.vala
     Views/AppInfoView.vala
     Views/AppListView.vala
-    Views/FeaturedView.vala
     Views/CategoryView.vala
     Views/SearchView.vala
     Views/InstalledView.vala
@@ -22,10 +21,8 @@ vala_precompile(VALA_C ${EXEC_NAME}
     Widgets/AppCarousel.vala
     Widgets/Banner.vala
     Widgets/CategoryItem.vala
-    Widgets/FeaturedButton.vala
     Widgets/PackageRow.vala
     Widgets/AppListRow.vala
-    Widgets/AppActionButton.vala
     Widgets/UpdateHeaderRow.vala
     Widgets/RestartDialog.vala
     Services/DbusInterfaces.vala
