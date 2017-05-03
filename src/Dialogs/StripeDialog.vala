@@ -213,6 +213,7 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
     }
 
     private void show_error_view () {
+        debug ("Show_error_view_()");
         if (error_layout == null) {
             error_layout = new Gtk.Grid ();
 
@@ -260,6 +261,7 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
     }
 
     private void show_card_view () {
+        debug ("Show_card_view_()");
         pay_button.label = _("Pay $%s.00").printf (amount.to_string ());
         cancel_button.label = _("Cancel");
 
@@ -367,26 +369,33 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
                     houston_data = post_to_houston (stripe_key, app_id, token_id, email_entry.text, (amount * 100).to_string ());
                     debug ("Houston data:%s", houston_data);
                 } else {
+                    debug ("ERROR! TokenID == null");
                     error = true;
                 }
 
                 if (houston_data != null) {
+                    debug ("Got Houston data...");
                     parser.load_from_data (houston_data);
                     root_object = parser.get_root ().get_object ();
 
                     if (root_object.has_member ("errors")) {
+                        debug ("ERROR! Houston data had error member");
                         error = true;
                     }
                 } else {
+                    debug ("ERROR! HoustonData == null");
                     error = true;
                 }
             } catch (Error e) {
+                debug ("I was caught.... %s", e.message);
                 error = true;
             }
 
             if (error) {
+                debug ("Yup, there was an error :(");
                 show_error_view ();
             } else {
+                debug ("Yay! :D All god");
                 download_requested ();
                 destroy ();
             }
