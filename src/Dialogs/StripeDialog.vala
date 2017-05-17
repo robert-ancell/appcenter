@@ -359,7 +359,7 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
             var year = (int.parse (card_expiration_entry.text[2:4]) + 2000).to_string ();
 
             var data = get_stripe_data (stripe_key, email_entry.text, (amount * 100).to_string (), card_number_entry.text, card_expiration_entry.text[0:2], year, card_cvc_entry.text);
-            debug ("Stripe data:%s", data);
+            debug ("Stripe response: %s", data);
             var error = false;
             try {
                 var parser = new Json.Parser ();
@@ -370,7 +370,7 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
                 string? houston_data = null;
                 if (token_id != null) {
                     houston_data = post_to_houston (stripe_key, app_id, token_id, email_entry.text, (amount * 100).to_string ());
-                    debug ("Houston data:%s", houston_data);
+                    debug ("Houston response: %s", houston_data);
                 } else {
                     error = true;
                 }
@@ -402,6 +402,8 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
 
     private string get_stripe_data (string _key, string _email, string _amount, string _cc_num, string _cc_exp_month, string _cc_exp_year, string _cc_cvc) {
         var uri = STRIPE_URI.printf (_email, USER_AGENT, _amount, _cc_num, _cc_cvc, _cc_exp_month, _cc_exp_year, _key);
+        debug ("Stripe data: %s", uri);
+        
         var session = new Soup.Session ();
         var message = new Soup.Message ("POST", uri);
         session.send_message (message);
@@ -416,6 +418,7 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
 
     private string post_to_houston (string _app_key, string _app_id, string _purchase_token, string _email, string _amount) {
         var uri = HOUSTON_URI.printf (_app_id, _app_key, _purchase_token, _email, _amount);
+        debug ("Houston data: %s", uri);
         var session = new Soup.Session ();
         var message = new Soup.Message ("POST", uri);
         session.send_message (message);
@@ -428,4 +431,3 @@ public class AppCenter.Widgets.StripeDialog : Gtk.Dialog {
         return data.str;
     }
 }
-
