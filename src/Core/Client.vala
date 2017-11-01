@@ -157,8 +157,37 @@ public class AppCenterCore.Client : Object {
         return null;
     }
 
+    private void snap_change_to_progress (Snapd.Change change, Pk.ProgressCallback cb) {
+        int64 done = 0, total = 0;
+        var tasks = change.get_tasks ();
+        for (var i = 0; i < tasks.length; i++) {
+            var task = tasks[i];
+            done += task.progress_done;
+            total += task.progress_total;
+        }
+        var progress = new Pk.Progress ();
+        progress.set_percentage ((int) (100 * done / total));
+        cb (progress, Pk.ProgressType.PERCENTAGE);
+    }
+
     public async Pk.Exit install_package (Package package, Pk.ProgressCallback cb, GLib.Cancellable cancellable) throws GLib.Error {
         task_count++;
+
+        var snap_bundle = package.component.get_bundle (AppStream.BundleKind.SNAP);
+        if (snap_bundle != null) {
+            var name = snap_bundle.get_id ();
+            try {
+                var client = new Snapd.Client ();
+                client.set_allow_interaction (true);
+                client.connect_sync ();
+                yield client.install2_async (Snapd.InstallFlags.CLASSIC, name, null, null, (client, change, deprecated) => { snap_change_to_progress (change, cb); }, cancellable);
+            }
+            catch (Error e) {
+                warning ("Failed to install snap %s: %s", name, e.message);
+                return Pk.Exit.FAILED;
+            }
+            return Pk.Exit.SUCCESS;
+        }
 
         Pk.Exit exit_status = Pk.Exit.UNKNOWN;
         string[] packages_ids = {};
@@ -236,6 +265,22 @@ public class AppCenterCore.Client : Object {
 
     public async Pk.Exit remove_package (Package package, Pk.ProgressCallback cb, GLib.Cancellable cancellable) throws GLib.Error {
         task_count++;
+
+        var snap_bundle = package.component.get_bundle (AppStream.BundleKind.SNAP);
+        if (snap_bundle != null) {
+            var name = snap_bundle.get_id ();
+            try {
+                var client = new Snapd.Client ();
+                client.set_allow_interaction (true);
+                client.connect_sync ();
+                yield client.remove_async (name, (client, change, deprecated) => { snap_change_to_progress (change, cb); }, cancellable);
+            }
+            catch (Error e) {
+                warning ("Failed to remove snap %s: %s", name, e.message);
+                return Pk.Exit.FAILED;
+            }
+            return Pk.Exit.SUCCESS;
+        }
 
         Pk.Exit exit_status = Pk.Exit.UNKNOWN;
         string[] packages_ids = {};
@@ -327,6 +372,47 @@ public class AppCenterCore.Client : Object {
         });
     }
 
+    private AppCenterCore.Package snap_to_package (Snapd.Snap snap) {
+        var component = new AppStream.Component ();
+        component.id = "snap:" + snap.name;
+        component.pkgnames = { snap.name };
+        var bundle = new AppStream.Bundle ();
+        bundle.set_id (snap.name);
+        bundle.set_kind (AppStream.BundleKind.SNAP);
+        component.add_bundle (bundle);
+
+        component.name = snap.title;
+        component.summary = snap.summary;
+        component.description = snap.description;
+        component.developer_name = snap.developer;
+
+        var icon_url = snap.get_icon ();
+        if (icon_url.has_prefix ("http://") || icon_url.has_prefix ("https://")) {
+            var icon = new AppStream.Icon ();
+            icon.set_kind (AppStream.IconKind.REMOTE);
+            icon.set_url (snap.get_icon ());
+            component.add_icon (icon);
+        }
+
+        var screenshots = snap.get_screenshots ();
+        for (var i = 0; i < screenshots.length; i++) {
+            var sshot = screenshots[i];
+            var s = new AppStream.Screenshot ();
+            var im = new AppStream.Image ();
+            im.set_kind (AppStream.ImageKind.SOURCE);
+            im.set_url (sshot.url);
+            im.set_width (sshot.width);
+            im.set_height (sshot.height);
+            s.set_kind (AppStream.ScreenshotKind.DEFAULT);
+            component.add_screenshot (s);
+        }
+
+        var package = new AppCenterCore.Package (component);
+        package.latest_version = snap.version;
+
+        return package;
+    }
+
     public async Gee.Collection<AppCenterCore.Package> get_installed_applications () {
         var packages = new Gee.TreeSet<AppCenterCore.Package> ();
         var installed = yield get_installed_packages ();
@@ -336,6 +422,20 @@ public class AppCenterCore.Client : Object {
                 populate_package (package, pk_package);
                 packages.add (package);
             }
+        }
+
+        try {
+            var client = new Snapd.Client ();
+            client.set_allow_interaction (true);
+            client.connect_sync ();
+            var snaps = yield client.list_async (null);
+            for (var i = 0; i < snaps.length; i++) {
+                var snap = snaps[i];
+                packages.add (snap_to_package (snap));
+            }
+        }
+        catch (Error e) {
+            critical (e.message);
         }
 
         return packages;
@@ -399,6 +499,20 @@ public class AppCenterCore.Client : Object {
                     apps.add (package);
                 }
             });
+        }
+
+        try {
+            var client = new Snapd.Client ();
+            client.set_allow_interaction (true);
+            client.connect_sync ();
+            var snaps = client.find_sync (Snapd.FindFlags.NONE, query, null);
+            for (var i = 0; i < snaps.length; i++) {
+                var snap = snaps[i];
+                apps.add (snap_to_package (snap));
+            }
+        }
+        catch (Error e) {
+            critical (e.message);
         }
 
         return apps;

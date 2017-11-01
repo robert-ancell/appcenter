@@ -130,6 +130,12 @@ public class AppCenterCore.Package : Object {
         }
     }
 
+    public bool is_snap {
+        get {
+            return component.get_bundle (AppStream.BundleKind.SNAP) != null;
+        }
+    }
+
     private string? _author = null;
     public string author {
         get {
@@ -544,7 +550,7 @@ public class AppCenterCore.Package : Object {
     }
 
     public Pk.Package? find_package () {
-        if (component.id == OS_UPDATES_ID || is_local) {
+        if (component.id == OS_UPDATES_ID || is_local || is_snap) {
             return null;
         }
 
